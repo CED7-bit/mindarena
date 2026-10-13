@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#0b1026"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>MindArena — Zekâ Antrenmanı</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:radial-gradient(1200px 800px at 50% -10%,#1e1b4b 0%,#0b1026 55%,#070b1a 100%);color:#e5e7eb;
+ font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+ -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+#app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;padding:14px 14px calc(18px + env(safe-area-inset-bottom))}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.mono,.clock,.chip b{font-variant-numeric:tabular-nums}
+h1,h2,.gname,.btn{font-family:'Sora','Manrope',system-ui,sans-serif}
+h1{font-size:26px;letter-spacing:-.02em;line-height:1.15}
+h2{font-size:22px;margin-bottom:6px;letter-spacing:-.015em;line-height:1.2}
+.gsub{font-size:12px;color:#94a3b8;letter-spacing:.01em}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:14px;margin:8px 0;
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.btn{width:100%;border:0;border-radius:16px;padding:15px 18px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;margin:6px 0;letter-spacing:.01em}
+.btn:disabled{opacity:.4}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 8px 24px rgba(139,92,246,.35)}
+.btn.gold{background:linear-gradient(135deg,#b45309,#fbbf24);color:#1c1917}
+.btn.ghost{background:rgba(255,255,255,.08)}
+.btn.big{font-size:19px;padding:18px}
+.iconbtn{width:44px;height:44px;min-width:44px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e5e7eb;font-size:18px;cursor:pointer}
+.linkbtn{background:none;border:0;color:#a78bfa;font-weight:700;font-size:14px;cursor:pointer;padding:8px 0}
+.row{display:flex;gap:10px;align-items:center}
+.center{text-align:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.gcard{display:flex;gap:10px;align-items:center;text-align:left;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:10px;color:#e5e7eb;cursor:pointer}
+.gcard:active{transform:scale(.97)}
+.gicon{font-size:26px}
+.skillbar{height:4px;width:70px;background:rgba(255,255,255,.12);border-radius:99px;margin-top:4px;overflow:hidden}
+.skillbar i{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#a78bfa)}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:4px 0 10px}
+.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;font-size:17px}
+.chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:6px 12px;font-size:13px}
+.gsel{cursor:pointer}
+.gsel.on{background:rgba(167,139,250,.35);border-color:#a78bfa}
+.orbbox{width:min(66vw,250px);aspect-ratio:1/1;margin:0 auto;position:relative}
+#orbCanvas{width:100%;height:100%;display:block;cursor:pointer}
+.pulse{animation:breath 3.2s ease-in-out infinite}
+@keyframes breath{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.bar{height:10px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin:8px 0}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#a78bfa)}
+.ghud{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0 8px}
+.gname{text-align:center;font-weight:800}
+.rule{font-size:13px;color:#94a3b8;margin-bottom:12px;text-align:center;min-height:16px}
+.clock{font-size:22px;font-weight:800;min-width:56px;text-align:right}
+.clock.hot{color:#f87171;animation:shk .5s infinite}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+.msg{min-height:22px;text-align:center;font-size:14px;color:#fbbf24;margin-top:8px}
+.tiles,.slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:58px;margin:10px 0}
+.tile,.slot{width:52px;height:52px;border-radius:12px;font-size:21px;font-weight:800;cursor:pointer}
+.tile{background:linear-gradient(180deg,#312e81,#1e1b4b);border:1px solid rgba(167,139,250,.5);color:#e5e7eb}
+.slot{border:2px dashed rgba(255,255,255,.25);background:none;color:#fff}
+.slot.filled{border-style:solid;border-color:#a78bfa;background:rgba(139,92,246,.2)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.opt{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;font-size:17px;font-weight:700;color:#e5e7eb;cursor:pointer;min-height:56px}
+.opt:active{transform:scale(.97)}
+.opt.right{border-color:#34d399;background:rgba(52,211,153,.18)}
+.opt.wrong{border-color:#f87171;background:rgba(248,113,113,.18)}
+.opt.dim{opacity:.3;pointer-events:none}
+.bigemoji{font-size:64px;text-align:center;margin:14px 0}
+.scen{font-size:16px;line-height:1.45;text-align:center}
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.pad{height:86px;border-radius:18px;border:2px solid rgba(255,255,255,.15);cursor:pointer;opacity:.55}
+.pad0{background:#7c3aed}.pad1{background:#0ea5e9}.pad2{background:#f59e0b}.pad3{background:#10b981}
+.pad.lit{opacity:1;box-shadow:0 0 26px rgba(255,255,255,.55);transform:scale(1.03)}
+.arena{position:relative;height:330px;margin-top:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden}
+.target{position:absolute;width:56px;height:56px;border-radius:50%;border:0;display:grid;place-items:center;font-size:20px;cursor:pointer;animation:popin .18s}
+@keyframes popin{from{transform:scale(.4);opacity:0}}
+.tg{background:radial-gradient(circle at 35% 30%,#a7f3d0,#10b981)}
+.tr{background:radial-gradient(circle at 35% 30%,#fecaca,#ef4444)}
+.shake{animation:shk .3s}
+.bins{margin-top:12px}
+.bin{font-size:17px}
+.ccard{min-height:150px;display:grid;place-items:center;text-align:center;font-size:20px;font-weight:800}
+.ccard.wrong{border-color:#f87171;background:rgba(248,113,113,.15)}
+.banner,.modal,.adov{position:fixed;inset:0;display:grid;place-items:center;z-index:50;text-align:center}
+.banner{background:rgba(7,11,26,.95)}
+.modal{background:rgba(0,0,0,.65);z-index:60}
+.adov{background:#0b0b12;z-index:70}
+.modalcard{max-width:340px;width:90%}
+.fly{position:fixed;left:50%;top:44%;transform:translateX(-50%);font-size:30px;font-weight:900;color:#fbbf24;animation:flyup 1s ease-out forwards;pointer-events:none;z-index:99}
+@keyframes flyup{to{transform:translate(-50%,-80px);opacity:0}}
+.rrow{justify-content:space-between;padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.06)}
+.dots{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.2)}
+.dot.on{background:#a78bfa}
+.hero{font-size:64px;margin:10px 0}
+.swatch{width:44px;height:44px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+.swatch.on{border-color:#fff}
+input.txt{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:14px;font-size:16px;color:#fff;outline:none}
+.bars .brow{margin:7px 0;cursor:pointer}
+.brow .bar{height:7px;margin:4px 0}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:14px}
+.trow:last-child{border-bottom:0}
+.trow.ok span{opacity:.6;text-decoration:line-through}
+.trow .rw{color:#fbbf24;font-weight:800}
+.trow.ok .rw{color:#34d399}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal" class="hidden"></div>
+<script>
+"use strict";
+/* ============ YARDIMCILAR ============ */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function seedRnd(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}
+ return()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return((h>>>0)%1e4)/1e4;};}
+
+/* ============ DURUM (offline, localStorage) ============ */
+const KEY='mindarena_v1';
+const DEF={name:'',color:'#a855f7',lang:'tr',calibrated:false,archetype:'',archIdx:null,goal:null,minutes:'10',
+ skills:[25,25,25,25,25,25,25,25],daily:{date:'',points:0,tours:0},streak:0,lastTour:'',lives:2,toursDone:0,history:{},best:0,
+ tasks:{date:'',defs:[],done:[],prog:{}},
+ settings:{sound:true,haptic:true}};
+function loadState(){try{const r=JSON.parse(localStorage.getItem(KEY));
+ if(r&&r.skills)return Object.assign(JSON.parse(JSON.stringify(DEF)),r);}catch(e){}
+ return JSON.parse(JSON.stringify(DEF));}
+let S=loadState();
+function save(){localStorage.setItem(KEY,JSON.stringify(S));}
+function istDate(off=0){return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul'}).format(new Date(Date.now()+off*864e5));}
+function rollover(){const t=istDate();
+ if(S.daily.date!==t){S.daily={date:t,points:0,tours:0};S.lives=Math.min(3,S.lives+1);save();}
+ if(!S.tasks||S.tasks.date!==t)initTasks();}
+
+/* ============ GÜNLÜK GÖREVLER ============ */
+const TASK_POOL={
+ tour1:{need:1,stat:'tours',rw:20,txt:()=>t('taskTour')},
+ practice2:{need:2,stat:'practice',rw:15,txt:()=>t('taskPrac')},
+ pts150:{need:150,stat:'points',rw:20,txt:()=>t('taskPts')}};
+function taskDef(id){if(TASK_POOL[id])return TASK_POOL[id];
+ if(/^w[0-7]$/.test(id)){const i=+id[1];
+  return{need:1,stat:'w'+i,rw:15,txt:()=>t('taskWin')(gSub(GAMES[i]))};}
+ return null;}
+function initTasks(){const d=istDate(),rnd=seedRnd('MA'+d);
+ const gi=Math.floor(rnd()*8),alt=rnd()<.5;
+ S.tasks={date:d,defs:[{id:alt?'pts150':'tour1'},{id:'practice2'},{id:'w'+gi}],done:[false,false,false],prog:{}};
+ save();}
+function checkTasks(){S.tasks.defs.forEach((d,k)=>{if(S.tasks.done[k])return;
+ const def=taskDef(d.id);if(!def)return;
+ const cur=def.stat==='points'?S.daily.points:(S.tasks.prog[def.stat]||0);
+ if(cur>=def.need){S.tasks.done[k]=true;
+  const rw=Math.min(def.rw,Math.max(0,480-S.daily.points));
+  S.daily.points+=rw;hap([20,50,20]);sfxGood();
+  toast('🎯 '+t('taskDone')+(rw>0?' +'+rw:''));}});}
+function taskEvent(stat,n){if(!S.tasks||S.tasks.date!==istDate())initTasks();
+ S.tasks.prog[stat]=(S.tasks.prog[stat]||0)+n;checkTasks();save();}
+
+/* ============ DİL & METİNLER ============ */
+const I18N={
+tr:{
+ tagline:'Zekânı geliştir.',ptsUnit:'puan',sec:' sn',
+ s1:'Anagram',s2:'Hızlı Hesap',s3:'Gölge Eşleştir',s4:'Ritim Tak',s5:'Refleks Hedef',s6:'Duygu Radarı',s7:'Öncelik Sırala',s8:'Hızlı Sınıflandır',
+ onb1t:'8 alan, tek tur',onb1d:'Gardner’ın çoklu zekâ kuramından ilhamla: her turda 8 farklı zihinsel beceriyi konuşturan 8 mini oyun.',
+ onb2t:'Enerji Küresi',onb2d:'Günde 3 puanlı tur (480 puan). Küre nefes alır gibi ilerleyişini gösterir; ışık huzmesi parmağını ve imlecini takip eder.',
+ onb3t:'Karşılaştırma yok, gelişim var',onb3d:'IQ veya klinik iddia yok. Sadece performansın, tutarlılığın ve keyifli bir alışkanlık.',
+ onb4t:'Önce oyna, sonra tanışalım',onb4d:'Kalibrasyon testini oyna, arketipini ve radarını gör; ardından adını, hedefini ve günlük ritmini söyleyip profilini oluşturuyoruz.',
+ next:'Devam',start:'Başla',skip:'Atla',
+ calibT:'Zihin Kalibrasyonu',calibD:'8 oyunun kısa denemelerinden oluşan bu test, başlangıç profilini ve Bilişsel Arketipini belirler (~3 dk). Test atlanamaz; yanlış cevaplar normaldir.',
+ calibWarm:'Cevaplarını dikkatle okuyoruz; bu test senin için bir etiket değil, bir başlangıç noktası.',calibStart:'Kalibrasyona Başla',
+ hello:'Merhaba',calibDone:'Kalibrasyon tamamlandı',archT:'Bilişsel Arketipin',
+ topSkill:'En güçlü alanın',focusSkill:'Gelişim alanın',planT:'Senin planın',
+ focusLine:g=>`İlerlemek için “${g}” oyununa ağırlık ver.`,
+ archNote:'Bu profil bir başlangıç noktasıdır; turlar oynadıkça radarın şekillenecek.',cont:'Devam',
+ profT:'Profilini Oluştur',profD:'Kalibrasyon bitti — son adım bu. Takma ad yeterli, hesap bağlamak isteyen sonradan bağlar.',nickPh:'Takma adın',
+ goalQ:'Hangi becerini önce geliştirmek istersin?',minQ:'Günde kaç dakika ayırabilirsin?',done:'Küreye Git',minUnit:'dk',
+ dailyP:'Günlük puan',lvl:'Seviye',
+ capped:'🔓 Günlük tavan doldu — bundan sonrası antrenman modu (puan işlenmez).',
+ tasksT:'Günlük Görevler',taskTour:'1 tur tamamla',taskPrac:'2 antrenman oyunu oyna',taskPts:'Bugün 150 puana ulaş',
+ taskWin:nm=>`“${nm}” oyununda 1 başarı kazan`,taskDone:'Görev tamamlandı!',
+ remain:(a,b)=>`Sıralamaya bugün ${a} puan kaldı. Tur: ${b}/3`,
+ tourStart:'TURA BAŞLA',trainStart:'ANTRENMAN TURU BAŞLAT',
+ practiceT:'Tek oyunluk antrenman',practiceD:'Puan işlenmez; gelişim metriklerin kaydedilir.',pStart:'Antrenmana Başla',pCancel:'Vazgeç',
+ radarBtn:'📈 Bilişsel Radarım',tot:(a,b)=>`Toplam ${a} tur · Rekor ${b}`,
+ orbToast:(a,b)=>`Bugün ${a}/3 tur · ${b}/480 puan`,
+ resT:'Tur tamamlandı!',resTr:'Antrenman turu tamamlandı',perfect:'8/8 kategori — kusursuz tur!',tourPts:'Tur puanı',
+ dailyLbl:'Günlük',streakLbl:'Seri',livesLbl:'Kalan can',home:'Küreye Dön',shareBtn:'🗂️ Bilişsel Radar Kartı (9:16)',
+ keep:'Serini koru: yarın yine bir tur!',capNote:'Tavan doldu — sonraki turlar antrenman sayılır.',
+ recT:'Bölüm Kurtarma',recLost:'bu bölümü kaybetmek üzeresin.',
+ recD:'Tekrar deneme hakkı kazan; can kullanmak otomatik başarı sağlamaz.',
+ adBtn:'▶ Reklam izle ve tekrar dene',lifeBtn:'❤ Can kullan',giveBtn:'Pes et (−80 puan)',
+ adNote:'Demo: reklam simülasyondur; yayında AdMob ödüllü reklam bağlanır.',adT:'Ödüllü Reklam',adDemo:'(demo simülasyon)',
+ quitC:'Kalibrasyondan çık?',quitCD:'Profilin oluşturulması için test gerekli.',backTest:'Teste Dön',exitYes:'Yine de çık',
+ quitT:'Bölümden çık?',quitTD:'Terk edersen bu bölüm başarısız sayılır (−80 puan kuralı).',stay:'Devam et',leave:'Terk et',
+ setT:'Ayarlar',snd:'🔊 Ses',hap:'📳 Titreşim',lang:'🌐 Dil',on:'Açık',off:'Kapalı',
+ about:'MindArena v1.2 (MVP)',
+ aboutD:'Gelişim amaçlı zihin antrenmanıdır; IQ veya klinik bir ölçüm iddiası içermez. Günlük sıfırlama Europe/Istanbul saatine göredir. Tamamen çevrimdışı çalışır; liderlik tablosu, reklam ağı ve uygulama içi satın alma mağaza sürümünde eklenir.',
+ reset:'Tüm ilerlemeyi sıfırla',resetD:'Hesap silme talepleri yayındaki sürümde uygulama içinden yapılabilir.',
+ sureT:'Emin misin?',sureD:'Tüm ilerlemen, profilin ve serin silinir.',yesReset:'Evet, sıfırla',no:'Vazgeç',
+ calibPre:'Kalibrasyon · ',practPre:'Antrenman · ',roundPre:i=>`Bölüm ${i}/8 · `,
+ practiceDone:'✅ Güzel antrenman!',practiceBad:'💪 Olmadı',prNoted:'Puan işlenmez; gelişim metriklerin kaydedildi.',
+ lifeT:'Hayatında nerede işine yarar?',grow:'Bu oyunla geliştir:',
+ w1:'Kelime',rights:'Hak',hint:'İpucu',wrongTry:'Yanlış — tekrar dene!',timeUp:'Süre doldu!',third:'3. yanlış! Kelime: ',hFor:'💡 İpucu: ',
+ anRule:'Harflere dokun, gizli kelimeyi kur. Kelime başına 2 yanlış hakkın var. İpucu karne puanını biraz düşürür.',
+ hesRule:(n,need)=>`Süre bitmeden doğru sonucu seç. Hedef: en az ${need}/${n}.`,
+ golRule:'Büyük şeklin doğru gölgesini bul. Her soruda 1 yanlış affedilir.',forgiven:'Affedildi — dikkatli tekrar dene!',
+ ritRule:'Diziyi dinle, aynı sırayla tekrar et. 1 hata affedilir; diziyi baştan dinlersin.',
+ listen:'Dinle...',turn:'Sıra sende!',mist:'Hata! Diziyi tekrar dinle.',
+ refRule:n=>`Yeşil hedefe dokun (+1), kırmızıya dokunma (−1). Hedef: ${n} net isabet.`,net:'Net',left:'Kalan',
+ emoRule:'Senaryoyu oku, duyguyu seç. Hata hakkı yoktur — dikkatli ol!',noRight:r=>(r?'Süre doldu!':'Yanlış duygu!')+' Hata hakkı yok...',
+ onRule:(n,need)=>`Kartlara dokunarak doğru sırayı kur (1 → 4). En az ${need}/${n} doğru olmalı.`,ok:'Onayla',
+ natLbl:'🌿 Doğal',artLbl:'İnsan yapımı 🏭',
+ sinRule:'Kartı doğru kutuya ayır. Yanlış ayrılan kart geri döner ve netinden düşer.',doneLbl:'Bitti!'
+},
+en:{
+ tagline:'Grow your intelligence.',ptsUnit:'pts',sec:' s',
+ s1:'Anagram',s2:'Quick Math',s3:'Shadow Match',s4:'Rhythm Repeat',s5:'Reflex Target',s6:'Emotion Radar',s7:'Priority Order',s8:'Quick Sort',
+ onb1t:'8 domains, one tour',onb1d:'Inspired by Gardner’s multiple intelligences: 8 mini games that exercise 8 different mental skills in every tour.',
+ onb2t:'Energy Sphere',onb2d:'3 scored tours a day (480 pts). The sphere breathes with your progress; its light rays follow your finger and cursor.',
+ onb3t:'No comparison, just growth',onb3d:'No IQ or clinical claims. Just your performance, your consistency, and a habit you enjoy.',
+ onb4t:'Play first, meet after',onb4d:'Play the calibration, see your archetype and radar — then tell us your name, goal and daily rhythm to build your profile.',
+ next:'Next',start:'Start',skip:'Skip',
+ calibT:'Mind Calibration',calibD:'Short trials of all 8 games shape your starting profile and Cognitive Archetype (~3 min). It cannot be skipped; wrong answers are fine.',
+ calibWarm:'We read your answers with care — this test is not a label, it is a starting point.',calibStart:'Start Calibration',
+ hello:'Hello',calibDone:'Calibration complete',archT:'Your Cognitive Archetype',
+ topSkill:'Strongest domain',focusSkill:'Growth domain',planT:'Your plan',
+ focusLine:g=>`To improve it, focus on the “${g}” game.`,
+ archNote:'This profile is a starting point — your radar will take shape as you play.',cont:'Continue',
+ profT:'Create Your Profile',profD:'Calibration done — this is the last step. A nickname is enough; you can link an account later.',nickPh:'Your nickname',
+ goalQ:'Which skill do you want to improve first?',minQ:'How many minutes can you spare per day?',done:'Go to Sphere',minUnit:'min',
+ dailyP:'Daily points',lvl:'Level',
+ capped:'🔓 Daily cap reached — from now on it’s training mode (no scoring).',
+ tasksT:'Daily Tasks',taskTour:'Complete 1 tour',taskPrac:'Play 2 practice games',taskPts:'Reach 150 points today',
+ taskWin:nm=>`Win 1 round of “${nm}”`,taskDone:'Task complete!',
+ remain:(a,b)=>`${a} points left in ranking today. Tour: ${b}/3`,
+ tourStart:'START TOUR',trainStart:'START TRAINING TOUR',
+ practiceT:'Single-game practice',practiceD:'No scoring; your growth metrics are recorded.',pStart:'Start Practice',pCancel:'Cancel',
+ radarBtn:'📈 My Cognitive Radar',tot:(a,b)=>`${a} tours in total · Best ${b}`,
+ orbToast:(a,b)=>`Today ${a}/3 tours · ${b}/480 pts`,
+ resT:'Tour complete!',resTr:'Training tour complete',perfect:'8/8 domains — flawless tour!',tourPts:'Tour points',
+ dailyLbl:'Daily',streakLbl:'Streak',livesLbl:'Lives left',home:'Back to Sphere',shareBtn:'🗂️ Cognitive Radar Card (9:16)',
+ keep:'Keep the streak: another tour tomorrow!',capNote:'Cap reached — next tours count as training.',
+ recT:'Round Rescue',recLost:'you are about to lose this round.',
+ recD:'Earn a retry; using a life does not guarantee success.',
+ adBtn:'▶ Watch ad and retry',lifeBtn:'❤ Use a life',giveBtn:'Give up (−80 pts)',
+ adNote:'Demo: the ad is simulated; production uses AdMob rewarded ads.',adT:'Rewarded Ad',adDemo:'(demo simulation)',
+ quitC:'Leave calibration?',quitCD:'The test is required to build your profile.',backTest:'Back to Test',exitYes:'Leave anyway',
+ quitT:'Leave the round?',quitTD:'Leaving counts this round as failed (−80 pts rule).',stay:'Keep playing',leave:'Leave',
+ setT:'Settings',snd:'🔊 Sound',hap:'📳 Haptics',lang:'🌐 Language',on:'On',off:'Off',
+ about:'MindArena v1.2 (MVP)',
+ aboutD:'A growth-oriented mind trainer; no IQ or clinical measurement claims. Daily reset follows Europe/Istanbul time. Works fully offline; leaderboards, ad network and in-app purchases come with the store version.',
+ reset:'Reset all progress',resetD:'Account deletion requests will be in-app in the released version.',
+ sureT:'Are you sure?',sureD:'All your progress, profile and streak will be deleted.',yesReset:'Yes, reset',no:'Cancel',
+ calibPre:'Calibration · ',practPre:'Practice · ',roundPre:i=>`Round ${i}/8 · `,
+ practiceDone:'✅ Nice practice!',practiceBad:'💪 Not this time',prNoted:'No scoring; your growth metrics were recorded.',
+ lifeT:'Where does it help in life?',grow:'Train it with:',
+ w1:'Word',rights:'Tries',hint:'Hint',wrongTry:'Wrong — try again!',timeUp:"Time's up!",third:'3rd wrong! Word: ',hFor:'💡 Hint: ',
+ anRule:'Tap letters to build the hidden word. 2 wrong tries per word. Hints slightly lower your score.',
+ hesRule:(n,need)=>`Pick the right answer before time runs out. Goal: at least ${need}/${n}.`,
+ golRule:'Find the big shape’s correct shadow. 1 mistake per question is forgiven.',forgiven:'Forgiven — look carefully and retry!',
+ ritRule:'Listen to the sequence, repeat it in order. 1 mistake is forgiven; you replay the sequence.',
+ listen:'Listen...',turn:'Your turn!',mist:'Wrong! Listen to the sequence again.',
+ refRule:n=>`Tap green targets (+1), avoid red (−1). Goal: ${n} net hits.`,net:'Net',left:'Left',
+ emoRule:'Read the scenario, pick the emotion. No mistake allowance — be careful!',noRight:r=>(r?"Time's up!":'Wrong emotion!')+' No mistake allowance...',
+ onRule:(n,need)=>`Tap cards to set the right order (1 → 4). At least ${need}/${n} must be correct.`,ok:'Confirm',
+ natLbl:'🌿 Natural',artLbl:'Man-made 🏭',
+ sinRule:'Sort each card into the right bin. A misplaced card returns and costs you a point.',doneLbl:'Done!'
+}};
+function t(k){const L=I18N[S.lang]||I18N.tr;const v=L[k];if(v!=null)return v;const v2=I18N.tr[k];return v2!=null?v2:k;}
+
+/* ============ OYUN İÇERİĞİ (dile göre) ============ */
+const CONTENT={
+tr:{
+ radar:['Sözel','Mantık','Uzay','Ritim','Refleks','Duygu','Öncelik','Doğa'],
+ skill:['Sözel-Dilsel','Mantıksal-Matematiksel','Uzamsal-Görsel','Müzikal-Ritmik','Bedensel-Kinestetik','Kişilerarası','İçsel Farkındalık','Doğa Gözlem'],
+ arch:['Anlatıcı','Analizci','Gözcü','Ritimci','Sprinter','Empat','Stratejist','Kaşif'],bal:'Dengeci',
+ WORDS:['ZİHİN','KİTAP','ELMAS','BAHÇE','DENİZ','KUZEY','ŞEKER','MAKAS','KALEM','BALIK','BULUT','ARABA','ÇİÇEK','SANAT','DOKTOR','KAPLAN','PATİK','ORMAN','LİMON','KEMER','BADEM','TAVŞAN','PİLOT','RÜZGAR'],
+ HINTS:{ZİHİN:'Düşünen organımız',KİTAP:'Sayfaları çevrilerek okunur',ELMAS:'En sert süs taşı',BAHÇE:'Çiçek yetiştirilen yer',DENİZ:'Tuzlu ve dalgası olan',KUZEY:'Pusulanın gösterdiği yön',ŞEKER:'Tatlılığı veren beyaz lezzet',MAKAS:'Kâğıt kesmeye yarar',KALEM:'Yazma aracı',BALIK:'Suda yaşayan yüzgeçli',BULUT:'Gökte süzülür, yağmur getirir',ARABA:'Dört tekerlekli taşıt',ÇİÇEK:'Kokusu ve rengiyle bahçenin yıldızı',SANAT:'Yaratıcılığın eseri',DOKTOR:'Sağlığımızla ilgilenen',KAPLAN:'Çizgili büyük kedi',PATİK:'Dağda yürüyüş yolu',ORMAN:'Ağaç denizi',LİMON:'Ekşi narenciye',KEMER:'Pantolon belini tutar',BADEM:'Kabuklu kuruyemiş',TAVŞAN:'Havuç sever, kulağı uzundur',PİLOT:'Uçağın kaptanı',RÜZGAR:'Esen hava akımı'},
+ EMO:[
+  {t:'Sunumdan hemen önce ellerin titriyor, kalbin hızla çarpıyor.',o:['Heyecan','Sıkıntı','Öfke','Gurur'],c:'Heyecan'},
+  {t:'Aylarca uğraştığın proje son anda iptal edildi.',o:['Neşe','Hayal kırıklığı','Korku','Şaşkınlık'],c:'Hayal kırıklığı'},
+  {t:'Kimse görmüyor diye kuralı çiğnemek içini rahatsız ediyor.',o:['Mutluluk','Suçluluk','Huzur','Kıskançlık'],c:'Suçluluk'},
+  {t:'Uzun süredir hazırlandığın sınavı geçtin.',o:['Gurur','Utangaçlık','İğrenme','Korku'],c:'Gurur'},
+  {t:'Verilen söz yine tutulmadı; sabrın taştı, kanın füze oldu.',o:['Sevinç','Öfke','Korku','Utanç'],c:'Öfke'},
+  {t:'Yüksekten aşağı bakınca ayakların uyuşuyor, kenara çekiliyorsun.',o:['Heyecan','Korku','Öfke','Huzur'],c:'Korku'},
+  {t:'Hiç beklemediğin bir anda sürpriz bir parti yapıldı.',o:['Şaşkınlık','Öfke','Kıskançlık','Pişmanlık'],c:'Şaşkınlık'},
+  {t:'Yaptığın hata yüzünden birine zor anlar yaşattın.',o:['Utanç','Gurur','Neşe','Rahatlama'],c:'Utanç'}],
+ PRI:[
+  {q:'Sağlıklı bir sabah için doğru sıra',items:['Su iç','10 dk hareket','Kahvaltı','Günün planını yap']},
+  {q:'Makarna pişirme sırası',items:['Suyu kaynat','Makarnayı ekle','Sosu hazırla','Servis et']},
+  {q:'Kısa bir öykü yazarken',items:['Konuyu seç','Taslak yap','Yazmaya başla','Düzenle ve bitir']},
+  {q:'Kargon gecikti: destek süreci',items:['Uygulamayı aç','Sipariş numarasını bul','Talep oluştur','Çözümü takip et']},
+  {q:'Deprem anında doğru davranış sırası',items:['Çök-Kapan-Tutun','Sarsıntının bitmesini bekle','Güvenli alana geç','Hasarı kontrol et']}],
+ CLS:[['🌳','Ağaç',0],['🐦','Kuş',0],['💧','Dere',0],['🪨','Kaya',0],['🌼','Papatya',0],['🐟','Balık',0],['🍄','Mantar',0],['⛰️','Dağ',0],['🐝','Arı',0],['🌴','Palmiye',0],['🦔','Kirpi',0],['🌊','Dalga',0],['🦋','Kelebek',0],['🌙','Ay',0],['🍒','Kiraz',0],
+  ['🚗','Araba',1],['📱','Telefon',1],['🪑','Sandalye',1],['👟','Sneaker',1],['💡','Ampul',1],['📚','Kitap',1],['🧱','Tuğla',1],['🎸','Gitar',1],['🥤','Kap',1],['⌚','Kol saati',1],['🚰','Musluk',1],['🪥','Fırça',1],['🧦','Çorap',1],['🔑','Anahtar',1],['🪟','Pencere',1]],
+ LIFE:['Okuma, yazma ve konuşma: iş görüşmeleri, sunumlar, e-postalar ve yeni bir dil öğrenirken hayatının her köşesinde karşına çıkar.',
+  'Bütçe yapmak, plan karşılaştırmak, sorun çözmek ve mantıklı kararlar vermek için kullanılır; analitik mesleklerin temelidir.',
+  'Harita okuma, eşya yerleştirme, park etme, tasarım ve mimari gibi alanlarda zihninden döndürme gücün olur.',
+  'Desen ve zamanlama: dil öğrenme, hafıza teknikleri, müzik, dans ve düzenli alışkanlıklar kurmakta işine yarar.',
+  'Vücudunu zamanlamak: sürüş, spor, el işi ve her türlü el-göz koordinasyonu gerektiren anda fark yaratır.',
+  'İnsanların duygusunu anlamak: müzakere, öğretmenlik, yöneticilik ve sağlıklı ilişkilerin anahtarıdır.',
+  'Kendi duygularını tanımak: stres yönetimi, hedef belirleme ve doğru zamanda doğru karar vermende yardımcıdır.',
+  'Detay ve desen fark etmek: bahçıvanlıktan yemek seçimine, alışverişte kaliteyi ayırt etmeye kadar gözün keskinleşir.']
+},
+en:{
+ radar:['Words','Logic','Space','Rhythm','Reflex','Emotion','Self','Nature'],
+ skill:['Verbal-Linguistic','Logical-Mathematical','Spatial-Visual','Musical-Rhythmic','Bodily-Kinesthetic','Interpersonal','Intrapersonal','Naturalistic'],
+ arch:['Storyteller','Analyst','Observer','Rhythmist','Sprinter','Empath','Strategist','Explorer'],bal:'Balancer',
+ WORDS:['MIND','BOOK','TIGER','LEMON','CLOUD','RIVER','NORTH','PILOT','RABBIT','FOREST','FLOWER','PLANET','SUGAR','PAPER','OCEAN','CHAIR','LIGHT','MUSIC','DREAM','HEART','SMILE','BRAIN','QUEST','MAPLE'],
+ HINTS:{MIND:'It thinks — it is you',BOOK:'You turn its pages',TIGER:'A big striped cat',LEMON:'A sour yellow fruit',CLOUD:'It floats in the sky',RIVER:'It flows to the sea',NORTH:'Where compasses point',PILOT:'Flies the plane',RABBIT:'Long ears, hops around',FOREST:'Full of trees',FLOWER:'Colorful and fragrant',PLANET:'Earth is one',SUGAR:'Makes things sweet',PAPER:'You write on it',OCEAN:'Vast salt water',CHAIR:'You sit on it',LIGHT:'The opposite of dark',MUSIC:'Organized sound',DREAM:'Stories while you sleep',HEART:'It pumps blood',SMILE:'You do it when happy',BRAIN:'The thinking organ',QUEST:'A brave search',MAPLE:'A tree famous for syrup'},
+ EMO:[
+  {t:'Your hands tremble right before a presentation; your heart races.',o:['Excitement','Boredom','Anger','Pride'],c:'Excitement'},
+  {t:'The project you worked on for months was cancelled at the last minute.',o:['Joy','Disappointment','Fear','Surprise'],c:'Disappointment'},
+  {t:'Breaking a rule when nobody is watching leaves you uneasy.',o:['Happiness','Guilt','Calm','Envy'],c:'Guilt'},
+  {t:'You passed the exam you had been preparing for so long.',o:['Pride','Shyness','Disgust','Fear'],c:'Pride'},
+  {t:'The promise was broken again; your patience ran out and your blood boiled.',o:['Delight','Anger','Fear','Shame'],c:'Anger'},
+  {t:'Looking down from a great height makes your feet go numb; you step back.',o:['Excitement','Fear','Anger','Peace'],c:'Fear'},
+  {t:'A surprise party was thrown just when you least expected it.',o:['Surprise','Anger','Envy','Regret'],c:'Surprise'},
+  {t:'Your mistake put someone through a hard time.',o:['Shame','Pride','Joy','Relief'],c:'Shame'}],
+ PRI:[
+  {q:'The right order for a healthy morning',items:['Drink water','Move for 10 min','Have breakfast','Plan the day']},
+  {q:'Cooking pasta, in order',items:['Boil the water','Add the pasta','Prepare the sauce','Serve']},
+  {q:'Writing a short story',items:['Pick a topic','Make a draft','Start writing','Edit and finish']},
+  {q:'Your package is late: the support process',items:['Open the app','Find the order number','Create a ticket','Follow the fix']},
+  {q:'The correct order in an earthquake',items:['Drop-Cover-Hold On','Wait for shaking to stop','Move to a safe area','Check for damage']}],
+ CLS:[['🌳','Tree',0],['🐦','Bird',0],['💧','Stream',0],['🪨','Rock',0],['🌼','Daisy',0],['🐟','Fish',0],['🍄','Mushroom',0],['⛰️','Mountain',0],['🐝','Bee',0],['🌴','Palm',0],['🦔','Hedgehog',0],['🌊','Wave',0],['🦋','Butterfly',0],['🌙','Moon',0],['🍒','Cherry',0],
+  ['🚗','Car',1],['📱','Phone',1],['🪑','Chair',1],['👟','Sneaker',1],['💡','Bulb',1],['📚','Book',1],['🧱','Brick',1],['🎸','Guitar',1],['🥤','Cup',1],['⌚','Watch',1],['🚰','Tap',1],['🪥','Brush',1],['🧦','Sock',1],['🔑','Key',1],['🪟','Window',1]],
+ LIFE:['Reading, writing and speaking: interviews, presentations, emails and learning a new language all draw on it.',
+  'Budgeting, comparing plans, solving problems and sound decisions — the core of analytical work.',
+  'Reading maps, packing a suitcase, parking, design and architecture — your mental rotation power.',
+  'Patterns and timing: language learning, memory techniques, music, dance and building steady habits.',
+  'Timing your body: driving, sports, crafts and every hand-eye coordination moment.',
+  'Reading people: negotiation, teaching, leadership and healthy relationships.',
+  'Knowing your own emotions: stress management, goal setting and well-timed decisions.',
+  'Noticing detail and pattern: from gardening to choosing good food, to spotting quality while shopping.']
+}};
+const C=()=>CONTENT[S.lang==='en'?'en':'tr'];
+
+/* ============ SES & TİTREŞİM ============ */
+let AC=null;
+function beep(f,d,type='sine',v=.15,delay=0){if(!S.settings.sound)return;
+ try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+ const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;
+ o.connect(g);g.connect(AC.destination);const tm=AC.currentTime+delay;
+ g.gain.setValueAtTime(v,tm);g.gain.exponentialRampToValueAtTime(.001,tm+d);
+ o.start(tm);o.stop(tm+d);}catch(e){}}
+const sfxGood=()=>{beep(880,.09);beep(1318,.16,'sine',.12,.09);};
+const sfxBad=()=>beep(165,.28,'sawtooth',.18);
+const sfxTap=()=>beep(620,.05,'sine',.08);
+function hap(p){if(S.settings.haptic&&navigator.vibrate)try{navigator.vibrate(p);}catch(e){}}
+
+/* ============ SÜRE SAYACI ============ */
+let clock=null;
+function stopClock(){if(clock){clearInterval(clock);clock=null;}}
+function startClock(sec,onEnd){stopClock();let ms=sec*1000;
+ const tick=()=>{const el=$('#clock');if(!el)return;const left=Math.max(0,Math.ceil(ms/1000));
+  el.textContent=left+t('sec');el.classList.toggle('hot',left<=5&&left>0);};
+ tick();clock=setInterval(()=>{ms-=100;if(ms<=0){stopClock();tick();onEnd&&onEnd();}else tick();},100);}
+
+/* ============ OYUN KAYDI ============ */
+const GAMES=[
+ {id:'anagram',i:0,icon:'🔤'},
+ {id:'hesap',i:1,icon:'🧮'},
+ {id:'golge',i:2,icon:'🦋'},
+ {id:'ritim',i:3,icon:'🎵'},
+ {id:'refleks',i:4,icon:'🎯'},
+ {id:'duygu',i:5,icon:'🎭'},
+ {id:'oncelik',i:6,icon:'🧭'},
+ {id:'sinif',i:7,icon:'🌿'}];
+/* Ana ad = zekâ türü, alt ad = mini oyunun adı */
+const gName=g=>C().skill[g.i],gSub=g=>t('s'+(g.i+1));
+const CALIB={anagram:{words:1},hesap:{n:3,need:2,t:10},golge:{n:2,t:12},ritim:{len:4},
+ refleks:{t:15,greens:8,need:5},duygu:{n:2,t:15},oncelik:{n:1,need:1},sinif:{t:20,cards:10,need:5}};
+/* ============ UYARLANIR ZORLUK (beceri puanına göre 0-4 seviye; kalibrasyon sabittir) ============ */
+function lvlOf(i){return clamp(Math.floor((S.skills[i]-25)/15),0,4);}
+function ADAPT(g){const L=lvlOf(g.i);
+ switch(g.id){
+  case'anagram':return{words:3+Math.floor(L/2),t:Math.max(18,30-L*3),lv:L};
+  case'hesap':{const n=5+L;return{n,need:Math.ceil(n*.8),t:Math.max(5,8-Math.floor(L/2)),lv:L};}
+  case'golge':{const n=4+L;return{n,need:Math.max(1,n-1),t:Math.max(8,12-Math.floor(L/2)),lv:L};}
+  case'ritim':return{len:8+L*2,spd:560-L*40,lv:L};
+  case'refleks':return{t:30,greens:15+L*2,need:10+Math.ceil(L*1.5),iv:620-L*40,lv:L};
+  case'duygu':return{n:4+(L>=3?2:0),t:Math.max(8,15-L),lv:L};
+  case'oncelik':{const n=3+Math.floor(L/2);return{n,need:Math.min(n,2+Math.floor(L/2)),lv:L};}
+  case'sinif':return{t:30+L*3,cards:Math.min(30,20+L*4),need:10+Math.ceil(L*2.5),lv:L};
+ }return{};}
+
+/* ============ ORTAK OYUN KABUĞU ============ */
+function shell(g,rule,body){return `<div class="ghud">
+ <button class="iconbtn" id="quitBtn">✕</button>
+ <div class="gname">${g.icon} ${gName(g)}<div class="gsub" style="font-weight:600;color:#c7d2fe">${gSub(g)}</div></div>
+ <div id="clock" class="clock mono">–</div></div>
+ <div class="rule">${rule}</div><div id="gbody" style="flex:1">${body}</div>`;}
+function fly(txt){const d=document.createElement('div');d.className='fly';d.textContent=txt;
+ document.body.appendChild(d);setTimeout(()=>d.remove(),1000);}
+function showBanner(text,icon,cb,sub){const d=document.createElement('div');d.className='banner';
+ d.innerHTML=`<div><div class="hero">${icon}</div><h2>${text}</h2>${sub?'<div class="gsub" style="font-weight:600;color:#c7d2fe;margin-top:2px">'+sub+'</div>':''}<div class="mono" style="font-size:42px;color:#fbbf24;margin-top:8px">3</div></div>`;
+ document.body.appendChild(d);let n=3;const c=d.querySelector('.mono');
+ const iv=setInterval(()=>{n--;if(n<=0){clearInterval(iv);d.remove();cb();}
+  else{c.textContent=n;hap(10);beep(500,.06);}},550);}
+function modal(html){const m=$('#modal');
+ m.innerHTML=`<div class="modal"><div class="card modalcard">${html}</div></div>`;m.classList.remove('hidden');}
+function closeModal(){const m=$('#modal');m.classList.add('hidden');m.innerHTML='';}
+function toast(txt){const d=document.createElement('div');d.className='banner';d.style.background='rgba(7,11,26,.85)';
+ d.innerHTML=`<div class="chip" style="font-size:15px">${txt}</div>`;document.body.appendChild(d);
+ setTimeout(()=>d.remove(),1400);}
+
+/* ============ TUR MOTORU ============ */
+let T=null,RUNID=0;
+function killRun(){RUNID++;stopClock();}
+function addSkill(i,perf){S.skills[i]=clamp(Math.round(S.skills[i]*.65+perf*.35),5,100);}
+function startTour(mode){killRun();T={mode,idx:0,results:[],pts:0,recUsed:false};nextGame();}
+function rankedActive(){return T&&T.mode==='ranked'&&S.daily.points<480;}
+function nextGame(){if(T.idx>=8){finishTour();return;}runGame();}
+function runGame(){rollover();const my=++RUNID;const g=GAMES[T.idx];const calib=T.mode==='calib';
+ showBanner((calib?t('calibPre'):T.mode==='practice'?t('practPre'):t('roundPre')(T.idx+1))+gName(g),g.icon,()=>{
+  if(my!==RUNID)return;
+  const cfg=calib?CALIB[g.id]:ADAPT(g);
+  GAMES_IMPL[g.id](cfg,res=>{ if(my!==RUNID)return; res=res||{success:false,perf:0};
+   if(T.mode==='practice'){addSkill(T.idx,res.perf);taskEvent('practice',1);save();
+    modal(`<h2 class="center">${res.success?t('practiceDone'):t('practiceBad')}</h2>
+     <p class="gsub center" style="margin:8px 0">${t('prNoted')}</p>
+     <button class="btn primary" onclick="closeModal();renderHome();">${t('home')}</button>`);return;}
+   if(T.mode==='calib'){S.skills[T.idx]=Math.max(10,Math.round(res.perf));save();
+    T.results.push({g,ok:res.success,pts:0});T.idx++;nextGame();return;}
+   if(res.success){addSkill(T.idx,res.perf);let add=0;
+    if(rankedActive()){add=Math.min(20,480-S.daily.points);S.daily.points+=add;T.pts+=add;}
+    T.results.push({g,ok:true,pts:add});T.recUsed=false;
+    taskEvent('w'+T.idx,1);taskEvent('wins',1);
+    if(add>0){fly('+'+add);sfxGood();}else sfxTap();hap([20,40,20]);
+    T.idx++;save();setTimeout(()=>{if(my===RUNID)nextGame();},650);}
+   else if(!T.recUsed&&T.mode==='ranked'){T.recUsed=true;renderRecovery(res.msg);}
+   else{applyPenalty();}
+  });},calib?gSub(g):gSub(g)+' · '+t('lvl')+' '+(lvlOf(g.i)+1)+'/5');}
+function applyPenalty(){killRun();const g=GAMES[T.idx];let sub=0;
+ if(T.mode==='ranked'&&rankedActive()||T.mode==='ranked'&&S.daily.points>0){
+  sub=Math.min(80,S.daily.points);S.daily.points-=sub;}
+ T.results.push({g,ok:false,pts:-sub});T.recUsed=false;T.idx++;save();
+ if(sub>0){fly('−'+sub);sfxBad();hap([60,40,60]);}
+ nextGame();}
+function finishTour(){killRun();
+ if(T.mode==='calib'){S.calibrated=true;const ai=calcArchetype();S.archIdx=ai;
+  S.archetype=ai<0?t('bal'):C().arch[ai];save();renderArchetype();return;}
+ const today=istDate();
+ if(S.lastTour!==today){S.streak=(S.lastTour===istDate(-1))?S.streak+1:1;S.lastTour=today;}
+ S.daily.tours=Math.min(3,S.daily.tours+1);S.toursDone++;
+ taskEvent('tours',1);
+ if(T.results.length===8&&T.results.every(r=>r.ok))taskEvent('perfect',1);
+ S.history[today]=S.daily.points;S.best=Math.max(S.best,S.daily.points);save();renderResults();}
+function quitConfirm(){killRun();
+ if(!T){renderHome();return;}
+ if(T.mode==='calib'){modal(`<h2 class="center">${t('quitC')}</h2>
+  <p class="gsub center" style="margin:8px 0">${t('quitCD')}</p>
+  <button class="btn primary" onclick="closeModal();renderCalibIntro();">${t('backTest')}</button>
+  <button class="btn ghost" onclick="closeModal();renderHome();">${t('exitYes')}</button>`);return;}
+ if(T.mode==='practice'){closeModal();renderHome();return;}
+ modal(`<h2 class="center">${t('quitT')}</h2>
+  <p class="gsub center" style="margin:8px 0">${t('quitTD')}</p>
+  <button class="btn primary" onclick="closeModal();">${t('stay')}</button>
+  <button class="btn ghost" onclick="closeModal();applyPenalty();">${t('leave')}</button>`);}
+
+/* ============ 8 MİNİ OYUN ============ */
+const GAMES_IMPL={};
+
+/* 1) ANAGRAM — karışık harfler + ipucu */
+GAMES_IMPL.anagram=function(cfg,finish){
+ const total=(cfg&&cfg.words)||3,TT=(cfg&&cfg.t)||30;const WD=C().WORDS,HT=C().HINTS;
+ const words=shuffle(WD).slice(0,total);
+ let wi=0,solved=0,rights=2,avail=[],chosen=[],hints=0,hintOn=false;
+ app.innerHTML=shell(GAMES[0],t('anRule'),
+  `<div class="row" style="justify-content:space-between"><span class="chip" id="wcount"></span><span class="chip" id="rights"></span></div>
+   <div id="slots" class="slots"></div><div id="tiles" class="tiles"></div>
+   <div class="center"><button class="linkbtn" id="hintBtn">💡 ${t('hint')}</button></div>
+   <div id="amsg" class="msg"></div>`);
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ $('#hintBtn').addEventListener('click',()=>{if(hintOn||!words[wi])return;
+  hintOn=true;hints++;sfxTap();hap(10);
+  $('#amsg').textContent=t('hFor')+HT[words[wi]];
+  $('#hintBtn').disabled=true;});
+ function loadWord(){const w=words[wi];hintOn=false;$('#hintBtn').disabled=false;
+  do{avail=shuffle(w.split('').map((ch,i)=>({ch,id:i})));}while(w.length>2&&avail.map(x=>x.ch).join('')===w);
+  chosen=[];$('#amsg').textContent='';
+  startClock(TT,()=>end(false,t('timeUp')));draw();}
+ function draw(){const w=words[wi];
+  $('#wcount').textContent=t('w1')+' '+(wi+1)+'/'+total;
+  $('#rights').textContent=t('rights')+': '+rights;
+  $('#slots').innerHTML=Array.from({length:w.length},(_,i)=>{const tt=chosen[i];
+   return tt?`<button class="slot filled" data-pos="${i}">${tt.ch}</button>`:'<div class="slot empty"></div>';}).join('');
+  $('#tiles').innerHTML=avail.map((tt,i)=>`<button class="tile" data-i="${i}">${tt.ch}</button>`).join('');
+  $('#slots').querySelectorAll('.filled').forEach(b=>b.addEventListener('click',()=>{
+   const p=+b.dataset.pos;avail.push(chosen[p]);chosen.splice(p,1);sfxTap();draw();}));
+  $('#tiles').querySelectorAll('.tile').forEach(b=>b.addEventListener('click',()=>{
+   const tt=avail.splice(+b.dataset.i,1)[0];chosen.push(tt);hap(8);sfxTap();draw();}));
+  if(chosen.length===w.length)setTimeout(check,120);}
+ function check(){const w=words[wi];const word=chosen.map(x=>x.ch).join('');
+  if(word===w){sfxGood();hap(20);wi++;solved++;$('#hintBtn').disabled=false;
+   if(wi===total)end(true);else loadWord();}
+  else{rights--;sfxBad();hap(80);chosen=[];
+   if(rights<0)end(false,t('third')+w);
+   else{$('#amsg').textContent=t('wrongTry');draw();}}}
+ function end(ok,msg){const perf=ok?clamp(90-hints*8,55,90):Math.round(solved/total*45);
+  finish({success:ok,perf,msg});}
+ loadWord();};
+
+/* 2) HIZLI HESAP */
+GAMES_IMPL.hesap=function(cfg,finish){
+ const n=(cfg&&cfg.n)||5,need=(cfg&&cfg.need)||4,tt=(cfg&&cfg.t)||8,lv=(cfg&&cfg.lv)||0;
+ let qi=0,ok=0;
+ app.innerHTML=shell(GAMES[1],t('hesRule')(n,need),'');
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ function gen(){const k=qi%5;let q;
+  if(k===0){const a=rint(12,58+25*lv),b=rint(12,48+22*lv);q={t:a+' + '+b+' = ?',c:a+b};}
+  else if(k===1){const a=rint(40,90+25*lv),b=rint(10,39+20*lv);q={t:a+' − '+b+' = ?',c:a-b};}
+  else if(k===2){const a=rint(6,12+3*lv),b=rint(3,9+2*lv);q={t:a+' × '+b+' = ?',c:a*b};}
+  else if(k===3){const a=rint(4,9+2*lv),b=rint(3,8+2*lv),c=rint(2,20+10*lv);q={t:a+' × '+b+' − '+c+' = ?',c:a*b-c};}
+  else{let s=rint(2,5+2*lv),seq=[s];for(let i=0;i<3;i++)seq.push(seq[i]*2+1);
+   q={t:seq.join(', ')+' , ?',c:seq[3]*2+1};}
+  const set=new Set([q.c]);
+  while(set.size<4){const d=q.c+pick([-1,1])*rint(1,Math.max(2,Math.round(Math.abs(q.c)*.2)+2));
+   if(d!==q.c)set.add(d);}
+  q.o=shuffle([...set]);return q;}
+ function load(){const q=gen();
+  $('#gbody').innerHTML=`<div class="card center"><div class="mono" style="font-size:30px;font-weight:800">${q.t}</div></div>
+   <div class="opts">${q.o.map(o=>`<button class="opt mono" data-o="${o}">${o}</button>`).join('')}</div>`;
+  startClock(tt,()=>resolve(null));
+  $('#gbody').querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>resolve(b)));
+  function resolve(btn){stopClock();
+   const good=btn&&+btn.dataset.o===q.c;
+   if(good){ok++;sfxGood();hap(15);next();}
+   else{sfxBad();hap(90);
+    if(btn)btn.classList.add('wrong');
+    $('#gbody').querySelectorAll('.opt').forEach(b=>{if(+b.dataset.o===q.c)b.classList.add('right');});
+    setTimeout(next,750);}}}
+ function next(){qi++;if(qi>=n){const suc=ok>=need;
+  finish({success:suc,perf:Math.round(ok/n*(suc?100:55))});}else load();}
+ load();};
+
+/* 3) GÖLGE EŞLEŞTİR */
+const SHAPES=['🦋','🐙','🦒','🐘','🐠','🦕','🚀','✈️','🎈','☂️','🔑','🕰️','🐧','🦉','🦔','🦩'];
+GAMES_IMPL.golge=function(cfg,finish){
+ const n=(cfg&&cfg.n)||4,tt=(cfg&&cfg.t)||12,need=(cfg&&cfg.need)||Math.max(1,n-1);
+ const shapes=shuffle(SHAPES).slice(0,n);let qi=0,ok=0,freeUsed=false;
+ app.innerHTML=shell(GAMES[2],t('golRule'),'');
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ function load(){freeUsed=false;const shape=shapes[qi];
+  const opts=shuffle([shape,...shuffle(SHAPES.filter(s=>s!==shape)).slice(0,3)]);
+  $('#gbody').innerHTML=`<div class="bigemoji">${shape}</div>
+   <div class="opts">${opts.map(o=>`<button class="opt" data-e="${o}"><span style="font-size:40px;filter:brightness(0) invert(.85)">${o}</span></button>`).join('')}</div>
+   <div id="gmsg" class="msg"></div>`;
+  startClock(tt,()=>qfail(null,true));
+  $('#gbody').querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+   if(b.dataset.e===shape){stopClock();ok++;sfxGood();hap(15);next();}
+   else if(!freeUsed){freeUsed=true;b.classList.add('dim');sfxBad();hap(60);
+    $('#gmsg').textContent=t('forgiven');}
+   else qfail(b,false);}));}
+ function qfail(btn,timeout){stopClock();sfxBad();hap(150);
+  if(btn)btn.classList.add('wrong');
+  $('#gbody').querySelectorAll('.opt').forEach(b=>{if(b.dataset.e===shapes[qi])b.classList.add('right');});
+  setTimeout(next,900);}
+ function next(){qi++;if(qi>=n){const suc=ok>=need;
+  finish({success:suc,perf:Math.round(ok/n*(suc?100:50))});}else load();}
+ load();};
+
+/* 4) RİTİM TAK */
+GAMES_IMPL.ritim=function(cfg,finish){
+ const len=(cfg&&cfg.len)||8,spd=(cfg&&cfg.spd)||560;let mistake=0,seq=[],idx=0,accept=false;
+ app.innerHTML=shell(GAMES[3],t('ritRule'),'');
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ $('#gbody').innerHTML=`<div class="pads">${[0,1,2,3].map(i=>`<button class="pad pad${i}" data-i="${i}"></button>`).join('')}</div><div id="rmsg" class="msg"></div>`;
+ const pads=[...document.querySelectorAll('.pad')];
+ const freqs=[261.6,329.6,392,523.3];
+ function light(i,d){pads[i].classList.add('lit');beep(freqs[i],d/1000+.06,'sine',.2);
+  setTimeout(()=>pads[i].classList.remove('lit'),d);}
+ seq=Array.from({length:len},()=>rint(0,3));
+ for(let i=1;i<seq.length;i++)if(seq[i]===seq[i-1]&&Math.random()<.7)seq[i]=(seq[i]+1+rint(0,2))%4;
+ function play(){accept=false;$('#rmsg').textContent=t('listen');
+  seq.forEach((s,i)=>setTimeout(()=>light(s,300),i*560));
+  setTimeout(()=>{accept=true;idx=0;$('#rmsg').textContent=t('turn');},seq.length*560+250);}
+ play();
+ pads.forEach(p=>p.addEventListener('pointerdown',()=>{
+  const i=+p.dataset.i;if(!accept)return;
+  light(i,150);
+  if(i===seq[idx]){idx++;hap(10);
+   if(idx===len)finish({success:true,perf:mistake?78:95});}
+  else{mistake++;sfxBad();hap(120);accept=false;
+   if(mistake>=2)finish({success:false,perf:35});
+   else{$('#rmsg').textContent=t('mist');setTimeout(play,900);}}}));};
+
+/* 5) REFLEKS HEDEF */
+GAMES_IMPL.refleks=function(cfg,finish){
+ const tt=(cfg&&cfg.t)||30,totalG=(cfg&&cfg.greens)||15,need=(cfg&&cfg.need)||10;
+ let spawned=0,net=0,ended=false,iv=null;const my=RUNID;
+ app.innerHTML=shell(GAMES[4],t('refRule')(need),
+  `<div class="row" style="justify-content:space-around"><span class="chip">🎯 ${t('net')}: <b id="net">0</b></span><span class="chip">🟢 ${t('left')}: <b id="left2">${totalG}</b></span></div><div id="arena" class="arena"></div>`);
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ const arena=$('#arena');
+ function evalEnd(){if(ended)return;ended=true;clearInterval(iv);
+  const ok=net>=need;finish({success:ok,perf:clamp(Math.round(net/totalG*100),0,100)});}
+ function spawn(){if(ended||my!==RUNID)return;
+  const isG=spawned<totalG&&Math.random()<.74;
+  const d=document.createElement('button');d.className='target '+(isG?'tg':'tr');
+  d.style.left=(8+Math.random()*76)+'%';d.style.top=(6+Math.random()*72)+'%';
+  d.textContent=isG?'🎯':'✕';let hit=false;
+  d.addEventListener('pointerdown',()=>{if(hit)return;hit=true;
+   if(isG){net++;beep(1200,.06,'square',.1);hap(12);}
+   else{net--;arena.classList.add('shake');setTimeout(()=>arena.classList.remove('shake'),320);sfxBad();hap([30,30,30]);}
+   $('#net').textContent=net;d.remove();});
+  arena.appendChild(d);
+  if(isG){spawned++;$('#left2').textContent=totalG-spawned;}
+  setTimeout(()=>{if(!hit){hit=true;d.remove();}},1600);
+  if(spawned>=totalG){clearInterval(iv);setTimeout(evalEnd,1700);}}
+ iv=setInterval(spawn,620);spawn();
+ startClock(tt,evalEnd);};
+
+/* 6) DUYGU RADARI */
+GAMES_IMPL.duygu=function(cfg,finish){
+ const n=(cfg&&cfg.n)||4;const scen=shuffle(C().EMO).slice(0,n);let qi=0,ok=0;
+ app.innerHTML=shell(GAMES[5],t('emoRule'),'');
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ function load(){const s=scen[qi];const opts=shuffle(s.o);
+  $('#gbody').innerHTML=`<div class="card scen">“${s.t}”</div>
+   <div class="opts">${opts.map(o=>`<button class="opt" data-o="${o}">${o}</button>`).join('')}</div><div id="gmsg" class="msg"></div>`;
+  startClock((cfg&&cfg.t)||15,()=>qfail(null,true));
+  $('#gbody').querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+   stopClock();
+   if(b.dataset.o===s.c){ok++;sfxGood();hap(15);next();}
+   else qfail(b,false);}));}
+ function qfail(btn,timeout){sfxBad();hap(150);
+  if(btn)btn.classList.add('wrong');
+  $('#gbody').querySelectorAll('.opt').forEach(b=>{if(b.dataset.o===scen[qi].c)b.classList.add('right');});
+  $('#gmsg').textContent=t('noRight')(timeout);
+  setTimeout(()=>finish({success:false,perf:Math.round(ok/n*45)}),1100);}
+ function next(){qi++;if(qi>=n)finish({success:true,perf:70+Math.round(30*ok/n)});else load();}
+ load();};
+
+/* 7) ÖNCELİK SIRALA */
+GAMES_IMPL.oncelik=function(cfg,finish){
+ const n=(cfg&&cfg.n)||3,need=(cfg&&cfg.need)||2;const scen=shuffle(C().PRI).slice(0,n);
+ let qi=0,ok=0,order=[];
+ app.innerHTML=shell(GAMES[6],t('onRule')(n,need),'');
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ function load(){const s=scen[qi];order=[];
+  const items=shuffle(s.items.map((txt,i)=>({txt,i})));
+  $('#gbody').innerHTML=`<div class="card scen">${s.q}</div><div id="olist" class="opts" style="grid-template-columns:1fr"></div>
+   <button class="btn primary" id="ook" disabled>${t('ok')}</button>`;
+  const list=$('#olist');
+  function draw(){list.innerHTML=items.map((it,pos)=>
+    `<button class="opt" data-pos="${pos}"><span class="mono" style="opacity:.75">${order.includes(pos)?(order.indexOf(pos)+1)+'.':'•'}</span>  ${it.txt}</button>`).join('');
+   list.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+    const p=+b.dataset.pos;
+    if(order.includes(p))order=order.filter(x=>x!==p);else order.push(p);
+    hap(8);beep(560+order.length*90,.06);draw();
+    $('#ook').disabled=order.length!==items.length;}));}
+  draw();
+  $('#ook').addEventListener('click',()=>{stopClock();
+   const good=order.every((p,i)=>items[p].i===i);
+   if(good){ok++;sfxGood();hap(20);next();}
+   else{sfxBad();hap(120);
+    list.innerHTML=s.items.map((txt,i)=>`<div class="opt right" style="cursor:default">${i+1}. ${txt}</div>`).join('');
+    setTimeout(next,1200);}});}
+ function next(){qi++;if(qi>=n){const suc=ok>=need;
+  finish({success:suc,perf:Math.round(ok/n*(suc?100:55))});}else load();}
+ load();};
+
+/* 8) HIZLI SINIFLANDIR */
+GAMES_IMPL.sinif=function(cfg,finish){
+ const tt=(cfg&&cfg.t)||30,cards=(cfg&&cfg.cards)||20,need=(cfg&&cfg.need)||10;
+ const queue=shuffle(C().CLS).slice(0,cards);let net=0,ended=false;
+ app.innerHTML=shell(GAMES[7],t('sinRule'),
+  `<div class="row" style="justify-content:space-around"><span class="chip">✅ ${t('net')}: <b id="cnet">0</b></span><span class="chip">🃏 ${t('left')}: <b id="cleft">${cards}</b></span></div>
+   <div id="ccard" class="card ccard"></div>
+   <div class="row bins"><button class="btn ghost bin" id="bl">${t('natLbl')}</button><button class="btn ghost bin" id="br">${t('artLbl')}</button></div>`);
+ $('#quitBtn').addEventListener('click',quitConfirm);
+ function draw(){const c=queue[0];$('#cleft').textContent=queue.length;
+  $('#ccard').innerHTML=c?`<div><div style="font-size:46px">${c[0]}</div><div style="margin-top:4px">${c[1]}</div></div>`
+   :`<div style="opacity:.5">${t('doneLbl')}</div>`;}
+ function decide(cls){if(ended)return;const c=queue[0];if(!c)return;
+  const el=$('#ccard');
+  if(c[2]===cls){net++;sfxTap();beep(760+net*10,.05);hap(10);queue.shift();}
+  else{net--;sfxBad();hap(70);el.classList.add('wrong');
+   setTimeout(()=>el.classList.remove('wrong'),260);
+   queue.push(queue.shift());}
+  $('#cnet').textContent=net;draw();
+  if(!queue.length){ended=true;stopClock();
+   const ok=net>=need;finish({success:ok,perf:clamp(Math.round((ok?60+net*2:net*4)),0,100)});}}
+ $('#bl').addEventListener('click',()=>decide(0));
+ $('#br').addEventListener('click',()=>decide(1));
+ draw();
+ startClock(tt,()=>{if(ended)return;ended=true;
+  const ok=net>=need;finish({success:ok,perf:clamp(Math.round((ok?60+net*2:net*4)),0,100)});});};
+
+/* ============ RADAR (SVG) ============ */
+function radarSVG(vals,size=320){const c=size/2,R=c-44;
+ const pt=(i,f)=>{const a=-Math.PI/2+i*Math.PI/4;return [c+R*f*Math.cos(a),c+R*f*Math.sin(a)];};
+ let out='';
+ for(const g of[.25,.5,.75,1])out+=`<polygon points="${vals.map((_,i)=>pt(i,g).map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="rgba(148,163,184,.18)"/>`;
+ for(let i=0;i<8;i++){const [x,y]=pt(i,1);
+  out+=`<line x1="${c}" y1="${c}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(148,163,184,.15)"/>`;}
+ out+=`<polygon points="${vals.map((v,i)=>pt(i,Math.max(.05,v/100)).map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="rgba(167,139,250,.4)" stroke="#a78bfa" stroke-width="2"/>`;
+ C().radar.forEach((nm,i)=>{const [x,y]=pt(i,1.18);
+  out+=`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" fill="#94a3b8" font-size="13">${nm}</text>`;});
+ return `<svg viewBox="0 0 ${size} ${size}" style="width:100%">${out}</svg>`;}
+function calcArchetype(){const mx=Math.max(...S.skills),mn=Math.min(...S.skills);
+ if(mx-mn<12)return -1;return S.skills.indexOf(mx);}
+
+/* ============ PAYLAŞIM KARTI (9:16) ============ */
+function shareCard(){const W=720,H=1280,c=document.createElement('canvas');c.width=W;c.height=H;
+ const x=c.getContext('2d');
+ const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1e1b4b');g.addColorStop(.6,'#0b1026');g.addColorStop(1,'#070b1a');
+ x.fillStyle=g;x.fillRect(0,0,W,H);
+ x.fillStyle='#fbbf24';x.font='800 52px Sora, system-ui';x.textAlign='center';x.fillText('MINDARENA',W/2,110);
+ x.fillStyle='#94a3b8';x.font='400 30px Manrope, system-ui';x.fillText(S.lang==='en'?'My Cognitive Radar Card':'Bilişsel Radar Kartım',W/2,160);
+ const cx=W/2,cy=610,R=250;
+ const pt=(i,f)=>{const a=-Math.PI/2+i*Math.PI/4;return [cx+R*f*Math.cos(a),cy+R*f*Math.sin(a)];};
+ x.strokeStyle='rgba(148,163,184,.3)';
+ for(const gr of[.25,.5,.75,1]){x.beginPath();for(let i=0;i<=8;i++){const p=pt(i%8,gr);i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]);}x.stroke();}
+ x.beginPath();S.skills.forEach((v,i)=>{const p=pt(i,Math.max(.05,v/100));i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]);});
+ x.closePath();x.fillStyle='rgba(167,139,250,.5)';x.fill();x.strokeStyle='#a78bfa';x.lineWidth=3;x.stroke();
+ x.fillStyle='#94a3b8';x.font='400 26px Manrope, system-ui';
+ C().radar.forEach((nm,i)=>{const p=pt(i,1.22);x.fillText(nm,p[0],p[1]+8);});
+ x.fillStyle='#fff';x.font='700 34px Sora, system-ui';
+ x.fillText((S.name||'—')+'  ·  '+(S.archetype||''),W/2,980);
+ x.fillStyle='#fbbf24';x.font='800 40px ui-monospace,monospace';
+ x.fillText('🔥 '+S.streak+(S.lang==='en'?' day streak':' gün seri')+'   ·   '+S.daily.points+' '+t('ptsUnit'),W/2,1050);
+ x.fillStyle='#64748b';x.font='400 24px Manrope, system-ui';
+ x.fillText('"'+t('tagline')+'" — '+istDate(),W/2,1180);
+ c.toBlob(b=>{if(!b)return;const f=new File([b],'mindarena-radar.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'MindArena'}).catch(()=>{});}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mindarena-radar.png';a.click();
+   toast(S.lang==='en'?'Card downloaded 📥':'Kart indirildi 📥');}});}
+
+/* ============ CANLI KÜRE (ışık huzmesi imleç/dokunma takip eder) ============ */
+let ORB=null;
+function stopOrb(){if(!ORB)return;cancelAnimationFrame(ORB.raf);
+ window.removeEventListener('pointermove',ORB.mv);window.removeEventListener('touchmove',ORB.mv);ORB=null;}
+function initOrb(){stopOrb();const cv=$('#orbCanvas');if(!cv)return;
+ const ctx=cv.getContext('2d');const dpr=Math.min(3,window.devicePixelRatio||1);
+ const W=cv.clientWidth||250,H=cv.clientHeight||250;
+ cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+ let px=W/2,py=H/2;
+ const mv=e=>{if(!ORB)return;const r=cv.getBoundingClientRect();
+  const x0=(e.touches?e.touches[0].clientX:e.clientX),y0=(e.touches?e.touches[0].clientY:e.clientY);
+  if(x0==null||x0===undefined)return;
+  px=clamp(x0-r.left,-W,W);py=clamp(y0-r.top,-H,H);};
+ window.addEventListener('pointermove',mv);window.addEventListener('touchmove',mv,{passive:true});
+ ORB={raf:0,mv};
+ let reduced=false;try{reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+ function draw(now){ctx.clearRect(0,0,W,H);
+  const cx=W/2+(px-W/2)*.10,cy=H/2+(py-H/2)*.10;
+  const base=Math.min(W,H)/2-6;
+  const R=base*.58*(1+Math.sin(now/900)*.02);
+  const ang=Math.atan2(py-cy,px-cx);
+  for(let i=0;i<30;i++){const a=i/30*Math.PI*2+now/6000;
+   let d=Math.abs(Math.atan2(Math.sin(a-ang),Math.cos(a-ang)));
+   const k=Math.max(0,1-d/1.4);
+   const r1=R*1.16,r2=base*(.70+k*.26)+Math.sin(now/350+i*1.7)*5;
+   ctx.strokeStyle=`rgba(167,139,250,${(.06+.30*k).toFixed(3)})`;
+   ctx.lineWidth=1.5+k*2.5;ctx.beginPath();
+   ctx.moveTo(cx+r1*Math.cos(a),cy+r1*Math.sin(a));
+   ctx.lineTo(cx+r2*Math.cos(a),cy+r2*Math.sin(a));ctx.stroke();}
+  const g=ctx.createRadialGradient(cx,cy,R*.2,cx,cy,base*1.05);
+  g.addColorStop(0,'rgba(139,92,246,.55)');g.addColorStop(1,'rgba(139,92,246,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,base*1.05,0,7);ctx.fill();
+  const og=ctx.createRadialGradient(cx-R*.3,cy-R*.35,R*.1,cx,cy,R);
+  og.addColorStop(0,'#c4b5fd');og.addColorStop(.55,'#7c3aed');og.addColorStop(1,'#1e1b4b');
+  ctx.fillStyle=og;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fill();
+  const fr=[[.80,clamp(S.daily.tours/3,0,1),'#fbbf24'],[.90,clamp(S.daily.points/480,0,1),'#22d3ee'],[1.0,clamp(S.streak/7,0,1),'#34d399']];
+  fr.forEach(([rr,f,col])=>{ctx.beginPath();ctx.arc(cx,cy,base*rr,0,7);
+   ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=4.5;ctx.stroke();
+   ctx.beginPath();ctx.arc(cx,cy,base*rr,-Math.PI/2,-Math.PI/2+2*Math.PI*f);
+   ctx.strokeStyle=col;ctx.lineCap='round';ctx.stroke();ctx.lineCap='butt';});
+  ctx.fillStyle='#fff';ctx.font='700 20px Sora, system-ui';ctx.textAlign='center';
+  ctx.fillText(S.daily.points,cx,cy+1);
+  ctx.fillStyle='#c7d2fe';ctx.font='11px Manrope, system-ui';
+  ctx.fillText(t('ptsUnit'),cx,cy+18);
+  ctx.globalCompositeOperation='lighter';
+  const hg=ctx.createRadialGradient(px,py,2,px,py,36);
+  hg.addColorStop(0,'rgba(196,181,253,.55)');hg.addColorStop(1,'rgba(196,181,253,0)');
+  ctx.fillStyle=hg;ctx.beginPath();ctx.arc(px,py,36,0,7);ctx.fill();
+  ctx.globalCompositeOperation='source-over';}
+ if(reduced){draw(0);}
+ else{const loop=n=>{if(!ORB)return;draw(n);ORB.raf=requestAnimationFrame(loop);};
+  ORB.raf=requestAnimationFrame(loop);}}
+
+/* ============ EKRANLAR ============ */
+function renderSplash(){stopOrb();app.innerHTML=`<div class="center" style="margin:auto">
+ <div class="pulse" style="width:150px;height:150px;margin:0 auto 20px;border-radius:50%;
+  background:radial-gradient(circle at 40% 32%,#c4b5fd,#7c3aed 55%,#1e1b4b);box-shadow:0 0 70px rgba(139,92,246,.6)"></div>
+ <h1>MindArena</h1><p class="gsub">${t('tagline')}</p></div>`;
+ setTimeout(()=>{S.calibrated?renderHome():renderOnboard();},1500);}
+
+function renderOnboard(){stopOrb();const slides=[
+ ['🧠',t('onb1t'),t('onb1d')],['⚡',t('onb2t'),t('onb2d')],
+ ['📊',t('onb3t'),t('onb3d')],['🎮',t('onb4t'),t('onb4d')]];
+ let i=0;
+ function draw(){const s=slides[i];
+  app.innerHTML=`<button class="iconbtn" id="langT" style="position:fixed;top:14px;right:14px;z-index:5">${S.lang==='tr'?'EN':'TR'}</button>
+   <div class="center" style="margin:auto"><div class="hero">${s[0]}</div>
+   <h2>${s[1]}</h2><p class="gsub" style="font-size:15px;line-height:1.5;margin:10px 0">${s[2]}</p>
+   <div class="dots">${slides.map((_,k)=>`<span class="dot ${k===i?'on':''}"></span>`).join('')}</div></div>
+   <button class="btn primary" id="nx">${i<slides.length-1?t('next'):t('start')}</button>
+   <button class="linkbtn" id="skip">${t('skip')}</button>`;
+  $('#langT').addEventListener('click',()=>{S.lang=S.lang==='tr'?'en':'tr';save();renderOnboard();});
+  $('#nx').addEventListener('click',()=>{sfxTap();i<slides.length-1?(i++,draw()):renderCalibIntro();});
+  $('#skip').addEventListener('click',renderCalibIntro);}
+ draw();}
+
+function renderCalibIntro(){stopOrb();app.innerHTML=`<div class="center" style="margin:auto">
+ <div class="hero">🧭</div><h2>${t('calibT')}</h2>
+ <p class="gsub" style="font-size:15px;line-height:1.5;margin:12px 0">${t('hello')}${S.name?', <b>'+S.name+'</b>':''}! ${t('calibD')}</p>
+ <p class="gsub" style="font-size:13px;line-height:1.5;margin:8px 0">${t('calibWarm')}</p></div>
+ <button class="btn primary big" id="st">${t('calibStart')}</button>`;
+ $('#st').addEventListener('click',()=>startTour('calib'));}
+
+function renderArchetype(){stopOrb();const ai=S.archIdx!=null?S.archIdx:calcArchetype();
+ const archName=ai<0?t('bal'):C().arch[ai];
+ const top=S.skills.indexOf(Math.max(...S.skills));
+ const foc=S.goal!=null?S.goal:S.skills.indexOf(Math.min(...S.skills));
+ const plan={'5':S.lang==='en'?'One tour a day is enough.':'Günde 1 tur yeterli.',
+  '10':S.lang==='en'?'One tour + one practice is ideal.':'1 tur + 1 antrenman ideal.',
+  '15':S.lang==='en'?'Two tours + one practice make a big difference.':'2 tur + 1 antrenman büyük fark yaratır.'}[S.minutes||'10'];
+ app.innerHTML=`<div class="center" style="margin:auto">
+ <div class="gsub">${t('hello')}${S.name?', '+S.name:''}! ${t('calibDone')}</div>
+ <div class="hero">🎓</div><h2>${t('archT')}</h2>
+ <div class="chip" style="display:inline-block;font-size:19px;padding:12px 22px;margin:10px 0">✦ ${archName}</div>
+ <div class="card">${radarSVG(S.skills)}</div>
+ <div class="card" style="text-align:left">
+  <div class="gsub">${t('topSkill')}</div>
+  <div style="font-weight:700;margin:2px 0 6px">${GAMES[top].icon} ${gName(GAMES[top])}</div>
+  <p class="gsub" style="line-height:1.5">${C().LIFE[top]}</p>
+  <div class="gsub" style="margin-top:12px">${t('focusSkill')}</div>
+  <div style="font-weight:700;margin:2px 0 6px">${GAMES[foc].icon} ${gName(GAMES[foc])}</div>
+  <p class="gsub" style="line-height:1.5">${t('focusLine')(gSub(GAMES[foc]))}</p></div>
+ <div class="card center"><div class="gsub">${t('planT')}</div><b>${(S.minutes||'10')} ${t('minUnit')} · ${plan}</b></div>
+ <p class="gsub">${t('archNote')}</p></div>
+ <button class="btn primary big" id="go">${t('cont')}</button>`;
+ $('#go').addEventListener('click',renderProfileCreate);}
+
+function lifeModal(i){modal(`<h2 class="center">${GAMES[i].icon} ${gName(GAMES[i])}</h2>
+ <div class="gsub center" style="font-weight:600;color:#c7d2fe">${gSub(GAMES[i])}</div>
+ <p style="font-size:15px;line-height:1.55;margin:10px 0;text-align:left">${C().LIFE[i]}</p>
+ <p class="gsub center">${t('grow')} <b>${gSub(GAMES[i])}</b></p>
+ <button class="btn primary" id="lfp">${t('pStart')}</button>
+ <button class="btn ghost" id="lfc">${t('pCancel')}</button>`);
+ $('#lfp').addEventListener('click',()=>{closeModal();killRun();
+  T={mode:'practice',idx:i,results:[],pts:0,recUsed:false};runGame();});
+ $('#lfc').addEventListener('click',closeModal);}
+
+function renderProfileCreate(){stopOrb();const colors=['#a855f7','#22d3ee','#fbbf24','#34d399','#f87171'];
+ let goal=S.goal!=null?S.goal:0,mins=S.minutes||'10';
+ app.innerHTML=`<div style="margin:auto"><h2 class="center">${t('profT')}</h2>
+  <p class="gsub center" style="margin:8px 0">${t('profD')}</p>
+  <div class="card"><input class="txt" id="nm" maxlength="16" placeholder="${t('nickPh')}" value="${S.name||''}">
+   <div class="row" style="justify-content:center;margin-top:14px" id="sw">
+    ${colors.map(c=>`<div class="swatch ${c===S.color?'on':''}" data-c="${c}" style="background:${c}"></div>`).join('')}</div></div>
+  <div class="card"><div class="gsub">${t('goalQ')}</div>
+   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px" id="goalWrap">
+    ${GAMES.map((g,i)=>`<button class="chip gsel ${goal===i?'on':''}" data-i="${i}">${g.icon} ${gName(g)}</button>`).join('')}</div>
+   <div class="gsub" style="margin-top:12px">${t('minQ')}</div>
+   <div class="row" id="minWrap" style="gap:8px;margin-top:6px">
+    ${['5','10','15'].map(m=>`<button class="chip gsel ${mins===m?'on':''}" data-m="${m}">${m} ${t('minUnit')}</button>`).join('')}</div></div></div>
+  <button class="btn primary big" id="done">${t('done')}</button>`;
+ $('#sw').querySelectorAll('.swatch').forEach(s=>s.addEventListener('click',()=>{
+  $('#sw').querySelectorAll('.swatch').forEach(x=>x.classList.toggle('on',x===s));sfxTap();}));
+ $('#goalWrap').querySelectorAll('.gsel').forEach(b=>b.addEventListener('click',()=>{
+  goal=+b.dataset.i;$('#goalWrap').querySelectorAll('.gsel').forEach(x=>x.classList.toggle('on',x===b));sfxTap();}));
+ $('#minWrap').querySelectorAll('.gsel').forEach(b=>b.addEventListener('click',()=>{
+  mins=b.dataset.m;$('#minWrap').querySelectorAll('.gsel').forEach(x=>x.classList.toggle('on',x===b));sfxTap();}));
+ $('#done').addEventListener('click',()=>{S.name=($('#nm').value||'—').trim();S.color=app.querySelector('.swatch.on').dataset.c;
+  S.goal=goal;S.minutes=mins;save();renderHome();});}
+
+function renderHome(){rollover();
+ const capped=S.daily.points>=480;
+ app.innerHTML=`
+ <div class="topbar">
+  <div class="row"><div class="avatar" style="background:${S.color}">${(S.name[0]||'M').toUpperCase()}</div>
+   <div><div style="font-weight:700">${S.name||'—'}</div>
+   <div class="gsub">🔥 ${S.streak} ${S.lang==='en'?'day streak':'gün seri'}  ·  ❤ ${S.lives}  ·  ✦ ${S.archetype||'—'}</div></div></div>
+  <button class="iconbtn" id="setBtn">⚙</button></div>
+ <div class="spherewrap"><div class="orbbox"><canvas id="orbCanvas"></canvas></div></div>
+ <div class="card">
+  <div class="row" style="justify-content:space-between"><span>${t('dailyP')}</span><b class="mono">${S.daily.points} / 480</b></div>
+  <div class="bar"><i style="width:${clamp(S.daily.points/480*100,0,100)}%"></i></div>
+  <div class="gsub">${capped?t('capped'):t('remain')(480-S.daily.points,S.daily.tours)}</div></div>
+ <button class="btn primary big" id="playBtn">${capped?t('trainStart'):t('tourStart')}</button>
+ <div class="grid">${GAMES.map((g,i)=>`<button class="gcard" data-i="${i}">
+   <div class="gicon">${g.icon}</div>
+   <div><div style="font-weight:700;font-size:14px">${gName(g)}</div><div class="gsub" style="color:#c7d2fe">${gSub(g)}</div>
+   <div class="skillbar"><i style="width:${S.skills[i]}%"></i></div></div></button>`).join('')}</div>
+ <div class="row" style="justify-content:space-between">
+  <button class="linkbtn" id="profBtn">${t('radarBtn')}</button>
+  <span class="gsub">${t('tot')(S.toursDone,S.best)}</span></div>`;
+ initOrb();
+ $('#orbCanvas').addEventListener('click',()=>{hap(15);beep(432,.25,'sine',.1);
+  toast(t('orbToast')(S.daily.tours,S.daily.points));});
+ $('#playBtn').addEventListener('click',()=>startTour(capped?'training':'ranked'));
+ $('#profBtn').addEventListener('click',renderProfile);
+ $('#setBtn').addEventListener('click',renderSettings);
+ app.querySelectorAll('.gcard').forEach(c=>c.addEventListener('click',()=>{
+  const i=+c.dataset.i;
+  modal(`<h2 class="center">${GAMES[i].icon} ${gName(GAMES[i])}</h2>
+   <div class="gsub center" style="font-weight:600;color:#c7d2fe">${gSub(GAMES[i])}</div>
+   <p class="gsub center" style="margin:8px 0">${t('practiceD')}</p>
+   <p style="font-size:13px;line-height:1.5;text-align:left;margin:8px 0;color:#cbd5e1">${C().LIFE[i]}</p>
+   <button class="btn primary" id="pok">${t('pStart')}</button>
+   <button class="btn ghost" id="pno">${t('pCancel')}</button>`);
+  $('#pok').addEventListener('click',()=>{closeModal();killRun();
+   T={mode:'practice',idx:i,results:[],pts:0,recUsed:false};runGame();});
+  $('#pno').addEventListener('click',closeModal);}));}
+
+function renderRecovery(msg){stopOrb();const g=GAMES[T.idx];
+ app.innerHTML=`<div class="center" style="margin:auto">
+  <div class="hero">💔</div><h2>${t('recT')}</h2>
+  <p class="gsub" style="margin:6px 0">${g.icon} ${gName(g)} — ${msg||t('recLost')}</p>
+  <p class="gsub">${t('recD')}</p></div>
+ <button class="btn gold big" id="adBtn">${t('adBtn')}</button>
+ <button class="btn primary" id="lifeBtn" ${S.lives>0?'':'disabled'}>${t('lifeBtn')} (${S.lives})</button>
+ <button class="btn ghost" id="giveBtn">${t('giveBtn')}</button>
+ <p class="gsub center">${t('adNote')}</p>`;
+ $('#adBtn').addEventListener('click',()=>{const d=document.createElement('div');d.className='adov';
+  d.innerHTML=`<div><div class="hero">🎬</div><h2>${t('adT')}</h2><p class="gsub">${t('adDemo')}</p>
+   <div class="mono" id="adn" style="font-size:40px;color:#fbbf24;margin-top:12px">3</div></div>`;
+  document.body.appendChild(d);let n=3;
+  const iv=setInterval(()=>{n--;const e=document.getElementById('adn');if(e)e.textContent=n;
+   if(n<=0){clearInterval(iv);d.remove();runGame();}},1000);});
+ $('#lifeBtn').addEventListener('click',()=>{if(S.lives>0){S.lives--;save();runGame();}});
+ $('#giveBtn').addEventListener('click',applyPenalty);}
+
+function renderResults(){stopOrb();const rows=T.results.map(r=>
+  `<div class="row rrow"><span>${r.g.icon} ${gName(r.g)} <span class="gsub" style="color:#c7d2fe">· ${gSub(r.g)}</span></span>
+   <b class="mono" style="color:${r.ok?'#34d399':'#f87171'}">${r.ok?'+'+r.pts:(r.pts?r.pts:'✗')}</b></div>`).join('');
+ const full=T.results.every(r=>r.ok)&&T.results.length===8;
+ app.innerHTML=`<div class="center"><div class="hero">${full?'🏆':T.pts>0?'💪':'🧠'}</div>
+  <h2>${T.mode==='training'?t('resTr'):t('resT')}</h2>
+  <div class="gsub">${full?t('perfect'):''}</div>
+  <div class="card center"><div class="gsub">${t('tourPts')}</div>
+   <div class="mono" style="font-size:44px;font-weight:800;color:#fbbf24">${T.pts}</div>
+   <div class="gsub">${t('dailyLbl')}: ${S.daily.points}/480 · ${t('streakLbl')}: ${S.streak} · ${t('livesLbl')}: ${S.lives}</div></div>
+  <div class="card" style="text-align:left">${rows}</div>
+  <button class="btn primary" id="homeBtn">${t('home')}</button>
+  <button class="btn ghost" id="shareBtn">${t('shareBtn')}</button>
+  <p class="gsub center" style="margin-top:8px">${S.daily.points>=480?t('capNote'):t('keep')}</p></div>`;
+ $('#homeBtn').addEventListener('click',renderHome);
+ $('#shareBtn').addEventListener('click',shareCard);}
+
+function renderProfile(){stopOrb();const bars=GAMES.map((g,i)=>
+  `<div class="brow" data-i="${i}"><div class="row" style="justify-content:space-between;font-size:13px"><span>${g.icon} ${gName(g)} <span class="gsub" style="color:#c7d2fe">· ${gSub(g)}</span></span><b class="mono">${S.skills[i]}</b></div>
+   <div class="bar"><i style="width:${S.skills[i]}%"></i></div></div>`).join('');
+ const max7=Math.max(80,...Object.values(S.history));
+ const chart=[...Array(7)].map((_,k)=>{const d=istDate(-(6-k));const v=S.history[d]||0;
+  return `<div style="text-align:center"><div style="height:${Math.max(4,v/max7*90)}px;width:22px;margin:0 auto;border-radius:6px;background:linear-gradient(180deg,#22d3ee,#7c3aed)"></div><div class="gsub" style="font-size:10px">${d.slice(8)}</div></div>`;}).join('');
+ app.innerHTML=`<div class="topbar"><button class="iconbtn" id="back">←</button><b>${t('radarBtn').replace('📈 ','')}</b><span style="width:44px"></span></div>
+ <div class="card">${radarSVG(S.skills)}
+  <div class="center chip" style="display:inline-block">✦ ${S.archetype||'—'}</div>
+  <p class="gsub center" style="margin-top:8px">${S.lang==='en'?'Tap a domain to see where it helps you in life.':'Bir alana dokun, hayatında nerede işine yaradığını gör.'}</p></div>
+ <div class="card bars">${bars}</div>
+ <div class="card"><div class="gsub" style="margin-bottom:8px">${S.lang==='en'?'Daily points, last 7 days (0–480)':'Son 7 günün günlük puanları (0–480)'}</div>
+  <div class="row" style="align-items:flex-end;justify-content:space-between;height:110px">${chart}</div></div>
+ <div class="row"><div class="chip" style="flex:1;text-align:center">🔥 ${t('streakLbl')}<br><b>${S.streak}</b></div>
+  <div class="chip" style="flex:1;text-align:center">🏁 ${S.lang==='en'?'Tours':'Tur'}<br><b>${S.toursDone}</b></div>
+  <div class="chip" style="flex:1;text-align:center">⭐ ${S.lang==='en'?'Best':'Rekor'}<br><b>${S.best}</b></div></div>
+ <button class="btn ghost" id="shareBtn">${t('shareBtn')}</button>`;
+ $('#back').addEventListener('click',renderHome);
+ $('#shareBtn').addEventListener('click',shareCard);
+ app.querySelectorAll('.brow').forEach(b=>b.addEventListener('click',()=>lifeModal(+b.dataset.i)));}
+
+function renderSettings(){stopOrb();app.innerHTML=`<div class="topbar"><button class="iconbtn" id="back">←</button><b>${t('setT')}</b><span style="width:44px"></span></div>
+ <div class="card">
+  <div class="row" style="justify-content:space-between;margin:8px 0"><span>${t('snd')}</span>
+   <button class="iconbtn" id="snd">${S.settings.sound?t('on'):t('off')}</button></div>
+  <div class="row" style="justify-content:space-between;margin:8px 0"><span>${t('hap')}</span>
+   <button class="iconbtn" id="hapB">${S.settings.haptic?t('on'):t('off')}</button></div>
+  <div class="row" style="justify-content:space-between;margin:8px 0"><span>${t('lang')}</span>
+   <button class="iconbtn" id="langB">${S.lang==='tr'?'Türkçe':'English'}</button></div></div>
+ <div class="card"><b>${t('about')}</b>
+  <p class="gsub" style="margin-top:6px;line-height:1.5">${t('aboutD')}</p></div>
+ <button class="btn ghost" id="rst">${t('reset')}</button>
+ <p class="gsub center">${t('resetD')}</p>`;
+ $('#back').addEventListener('click',renderHome);
+ $('#snd').addEventListener('click',e=>{S.settings.sound=!S.settings.sound;save();e.target.textContent=S.settings.sound?t('on'):t('off');});
+ $('#hapB').addEventListener('click',e=>{S.settings.haptic=!S.settings.haptic;save();e.target.textContent=S.settings.haptic?t('on'):t('off');});
+ $('#langB').addEventListener('click',()=>{S.lang=S.lang==='tr'?'en':'tr';if(S.archIdx!=null)S.archetype=S.archIdx<0?t('bal'):C().arch[S.archIdx];save();renderSettings();});
+ $('#rst').addEventListener('click',()=>modal(`<h2 class="center">${t('sureT')}</h2>
+  <p class="gsub center" style="margin:8px 0">${t('sureD')}</p>
+  <button class="btn ghost" id="ryes">${t('yesReset')}</button>
+  <button class="btn primary" id="rno">${t('no')}</button>`)||
+  ($('#ryes').addEventListener('click',()=>{localStorage.removeItem(KEY);location.reload();}),
+   $('#rno').addEventListener('click',closeModal)));}
+
+/* ============ BAŞLAT ============ */
+rollover();
+renderSplash();
+</script>
+</body>
+</html>
